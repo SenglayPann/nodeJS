@@ -4,6 +4,7 @@
 //   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 // );
 
+const { error } = require('console');
 const Tour = require('../models/tourModel');
 
 // exports.checkID = (req, res, next, val) => {
@@ -43,17 +44,43 @@ exports.getAllTours = async (req, res) => {
   
   try {
     // BUILD QUERY
+    // 1A) FILTERING
     const queryObj = {...req.query};
-    const excludedFields = ['page', 'sort', 'limit', 'fields']
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach(el => delete queryObj[el]);
     
-    // ANVANCED FILTERING
-    let queryStr = JSON.stringify(queryObj)
+    // 1B) ANVANCED FILTERING
+    let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
-    console.log(JSON.parse(queryStr));
     
-    const query = Tour.find(JSON.parse(queryStr));
-    
+    let query = Tour.find(JSON.parse(queryStr));
+
+    // 2) SORTING
+    if (req.query.sort) {
+      console.log(req.query);
+      query = query.sort(req.query.sort);
+    } else {
+      query = query.sort('createAt');
+    }
+
+    // 3) FIELDS LIMITING
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ');
+      console.log(fields)
+      query = query.select(fields);
+    }
+
+    // 4) PAGINATION
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 100;
+    const skip = (page - 1) * limit;
+    query = query.skip(skip).limit(limit);
+
+    if (req.query.page) {
+      const tourCount = await Tour.countDocuments();
+      if ( skip >= tourCount) throw new Error('This page is not found!');
+    }
+
     // REXECUTE THE QUERY 
     const tours = await query
 
