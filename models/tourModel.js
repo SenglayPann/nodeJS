@@ -1,5 +1,6 @@
 const mongoose =  require('mongoose');
 const dotenv = require('dotenv');
+const slugify = require('slugify');
 
 dotenv.config({path: './config.env'});
 
@@ -25,6 +26,7 @@ const tourSchema = new mongoose.Schema(
       unique: true,
       trim: true
     },
+    slug: String,
     duration: {
       type: Number,
       required: true
@@ -76,12 +78,29 @@ const tourSchema = new mongoose.Schema(
   },
   {
     toJSON: { virtuals: true },
-    toObject: { durationWeeks }
+    toObject: { durationWeeks: true }
   }
 );
 
 tourSchema.virtual('durationWeeks').get(function() {
   return this.duration / 7
+})
+
+// DOCUMENT MIDDLEWRE: run before .save() and .create()
+tourSchema.pre('save', function(next) {
+  this.slug = slugify(this.name, { lower: true });
+  // this.slug = this.name;
+  next();
+});
+
+tourSchema.pre('save', function(next) {
+  console.log('will save doc...');
+  next();
+})
+
+tourSchema.post('save', function(doc, next) {
+  console.log(doc)
+  next();
 })
 
 module.exports = mongoose.model('tour', tourSchema);
