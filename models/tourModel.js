@@ -121,4 +121,11 @@ tourSchema.post(/^find/, function(doc, next) {
   next();
 })
 
+// AGGREGATION MIDDLEWARE
+tourSchema.pre('aggregate', function(next) {
+  this.pipeline().unshift({ $match: { secretTour: { $ne: true} } });
+  next();
+});
+
+tourSchema
 module.exports = mongoose.model('tour', tourSchema);
