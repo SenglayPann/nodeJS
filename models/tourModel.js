@@ -1,6 +1,7 @@
 const mongoose =  require('mongoose');
 const dotenv = require('dotenv');
 const slugify = require('slugify');
+const validator = require('validator')
 
 dotenv.config({path: './config.env'});
 
@@ -27,6 +28,10 @@ const tourSchema = new mongoose.Schema(
       trim: true,
       maxlength: [40, 'tour name must be have equal to or less than 40 characters.'],
       minlength: [10, 'tour name must be have equal to or more than 40 characters.'],
+      // validate: {
+      //   validator: validator.isAlpha,
+      //   message: 'Tour name must only contain alphabet'
+      // }
     },
     slug: String,
     duration: {
@@ -63,7 +68,16 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'A tour must have a price!']
     },
-    priceDiscount: Number,
+    priceDiscount: {
+      type: Number,
+      validate: {
+        validator: function(val) {
+          // this only points to current doc on New document creation
+          return val < this.price;
+        },
+        message: 'Discount price must be less than the actual price.'
+      }
+    },
     summary: {
       type: String,
       trim: true
