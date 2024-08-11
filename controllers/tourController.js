@@ -213,9 +213,9 @@ exports.getMonthlyPlan = async (req, res) => {
       {
         $sort: { month: 1}
       },
-      {
-        $limit: {  }
-      }
+      // {
+      //   $limit: 6
+      // }
     ]);
 
     res.status(200).json({
@@ -230,6 +230,7 @@ exports.getMonthlyPlan = async (req, res) => {
     res.status(404).json({
       status: 'fail',
       message: err
+    });
     });
   }
 }
