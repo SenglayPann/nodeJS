@@ -73,7 +73,11 @@ const tourSchema = new mongoose.Schema(
       type: Date,
       default: Date.now()
     },
-    startDates: [Date]
+    startDates: [Date],
+    secretTour: {
+      type: Boolean,
+      default: false
+    }
 
   },
   {
@@ -93,13 +97,27 @@ tourSchema.pre('save', function(next) {
   next();
 });
 
-tourSchema.pre('save', function(next) {
-  console.log('will save doc...');
-  next();
-})
+// tourSchema.pre('save', function(next) {
+//   console.log('will save doc...');
+//   next();
+// })
 
-tourSchema.post('save', function(doc, next) {
-  console.log(doc)
+// tourSchema.post('save', function(doc, next) {
+//   console.log(doc)
+//   next();
+// })
+
+// QUEERY MIDDLEWARE
+
+// tourSchema.pre('find', function(next) {
+tourSchema.pre(/^find/, function(next) {
+  this.find({ secretTour: { $ne: true } });
+  this.start =  Date.now();
+  next();
+});
+
+tourSchema.post(/^find/, function(doc, next) {
+  console.log(`time took for this middleware is ${ Date.now() - this.start} ms`);
   next();
 })
 
