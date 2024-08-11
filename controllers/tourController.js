@@ -224,13 +224,12 @@ exports.getMonthlyPlan = async (req, res) => {
       data: {
         plan
       }
-    })
+    });
     
   } catch (err) {
     res.status(404).json({
       status: 'fail',
       message: err
     });
-    });
-  }
+  };
 }
