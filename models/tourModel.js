@@ -1,12 +1,11 @@
 const mongoose =  require('mongoose');
 const dotenv = require('dotenv');
 const slugify = require('slugify');
-const validator = require('validator')
+const validator = require('validator');
 
 dotenv.config({path: './config.env'});
 
 const DB = process.env.DATABASE.replace('<PASSWORD>', process.env.DATABASE_PASSWORD);
-
 
 mongoose
   .connect(DB, {
@@ -134,14 +133,14 @@ tourSchema.pre('save', function(next) {
 // tourSchema.pre('find', function(next) {
 tourSchema.pre(/^find/, function(next) {
   this.find({ secretTour: { $ne: true } });
-  this.start =  Date.now();
+  this.start = Date.now();
   next();
 });
 
 tourSchema.post(/^find/, function(doc, next) {
   console.log(`time took for this middleware is ${ Date.now() - this.start} ms`);
   next();
-})
+});
 
 // AGGREGATION MIDDLEWARE
 tourSchema.pre('aggregate', function(next) {
