@@ -5,6 +5,12 @@ const handleDBError = (error) => {
   return new AppError(message, 400);
 }
 
+const handleDBDuplicateFileError = (error) => {
+  const value = error.errmsg.match(/(["'])(\\?.)*?\1/)[0];
+  const message = `Duplicate field value: ${value} already exists`;
+  return new AppError(message, 400);
+};
+
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
     status: err.status,
@@ -45,7 +51,8 @@ module.exports = (err, req, res, next) => {
   else if (process.env.NODE_ENV === 'production'){
     let error = {...err}
 
-    if (err.name === 'CastError') error = handleDBError(err)
+    if (err.name === 'CastError') error = handleDBError(err);
+    if (err.code === 11000) error = handleDBDuplicateFileError(err);
 
     sendErrorProd(error, res);
   };
