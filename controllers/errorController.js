@@ -11,6 +11,12 @@ const handleDBDuplicateFileError = (error) => {
   return new AppError(message, 400);
 };
 
+const handleDBValidationError = (err) => {
+  const errors = Object.values(err.errors).map(el => el.message);
+  const message = errors.join(', ');
+  return new AppError(message, 400);
+}
+
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
     status: err.status,
@@ -53,6 +59,7 @@ module.exports = (err, req, res, next) => {
 
     if (err.name === 'CastError') error = handleDBError(err);
     if (err.code === 11000) error = handleDBDuplicateFileError(err);
+    if (err.name === 'ValidationError') error = handleDBValidationError(err);
 
     sendErrorProd(error, res);
   };
