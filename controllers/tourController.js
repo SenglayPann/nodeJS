@@ -1,15 +1,16 @@
 const Tour = require('../models/tourModel');
 const APIFeatures = require('../utils/apiFeature');
+const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
-exports.aliasTopTours = async (req, res, next) => {
+exports.aliasTopTours = (req, res, next) => {
   req.query.limit = 5;
   req.query.sort = '-ratingAverage,price';
   req.query.fields = 'name,price,ratingAverage,summary,difficulty';
   next();
 }
 
-exports.getAllTours = catchAsync(async (req, res) => {
+exports.getAllTours = catchAsync(async (req, res, next) => {
   
   // REXECUTE THE QUERY 
   const features = new APIFeatures(Tour.find(), req.query)
@@ -30,9 +31,14 @@ exports.getAllTours = catchAsync(async (req, res) => {
   });
 });
 
-exports.getTour = catchAsync(async (req, res) => {
+exports.getTour = catchAsync(async (req, res, next) => {
 
   const tour = await Tour.findById(req.params.id);
+  console.log("line: 37: ",tour)
+
+  if(!tour) {
+    return next(new AppError(`No tour was found fo the id ${req.params.id}`), 404);
+  };
   
   res.status(200).json({
     status: 'success',
@@ -42,7 +48,7 @@ exports.getTour = catchAsync(async (req, res) => {
   });
 });
 
-exports.createTour = catchAsync(async (req, res) => {
+exports.createTour = catchAsync(async (req, res, next) => {
 
   const newTour = await Tour.create(req.body);
 
@@ -53,7 +59,7 @@ exports.createTour = catchAsync(async (req, res) => {
 
 });
 
-exports.updateTour = catchAsync(async (req, res) => {
+exports.updateTour = catchAsync(async (req, res, next) => {
 
   const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidator: true });  // the thrid argument will update data with the new one that returned
 
