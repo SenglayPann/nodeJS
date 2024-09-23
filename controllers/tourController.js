@@ -63,6 +63,10 @@ exports.updateTour = catchAsync(async (req, res, next) => {
 
   const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidator: true });  // the thrid argument will update data with the new one that returned
 
+  if (!tour) {
+    return next(new AppError(`No tour was found for id ${req.params.id}`), 404);
+  }
+
   res.status(200).json({
     status: 'success',
     data: tour
@@ -71,7 +75,11 @@ exports.updateTour = catchAsync(async (req, res, next) => {
 
 exports.deleteTour = catchAsync(async (req, res) => {
 
-  await Tour.findByIdAndDelete(req.params.id);
+  const tour = await Tour.findByIdAndDelete(req.params.id);
+
+  if (!tour) {
+    return next(new AppError(`No tour was found for id ${req.params.id}`, 404));
+  }
 
   res.status(204).json({
     status: 'success',
