@@ -1,8 +1,10 @@
+const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const app = require('../app');
+const { promises } = require('dns');
 
 const signToken = id => {
   const secret = process.env.JWT_SECRET
@@ -63,8 +65,13 @@ exports.protect = catchAsync(async (req, res, next) => {
   };
 
   if (!token) {
-    return next(new AppError('you are neot logged in, Please login.', 401));
+    return next(new AppError('you are not logged in, Please login.', 401));
   };
+
+  const secret = process.env.JWT_SECRET;
+  const decodedToken = await promisify(jwt.verify) (token, secret);
+
+  // console.log(decodedToken);
 
   // 2) VERIFICATION TOKEN
 
