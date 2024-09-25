@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const app = require('../app');
 
 const signToken = id => {
   const secret = process.env.JWT_SECRET
@@ -49,5 +50,27 @@ exports.login = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     token,
-  })
-})
+  });
+});
+
+exports.protect = catchAsync(async (req, res, next) => {
+  // 1) GETTING TOKEN AND CHECK IF IT'S THERE
+  let token;
+  const authHeaders = req.headers.authorization;
+
+  if (authHeaders && authHeaders.startsWith('Bearer')) {
+    token = authHeaders.split(' ')[1];
+  };
+
+  if (!token) {
+    return next(new AppError('you are neot logged in, Please login.', 401));
+  };
+
+  // 2) VERIFICATION TOKEN
+
+  // 3) CHECK IF USER STILL EXISTS
+
+  // 4) CHECK IF USER CHANGED PASSWORD AFTER THE TOKEN WAS ISSUED
+
+  next();
+});
