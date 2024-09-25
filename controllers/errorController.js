@@ -1,7 +1,7 @@
 const AppError = require("../utils/appError");
 
 const handleExpiredTokenError = (error) => {
-  const message =  'Your token has expired, Please Log in again!';
+  const message = 'Your token has expired, Please Log in again!';
   return new AppError(message, 401);
 }
 
@@ -11,7 +11,7 @@ const handleJWTError = (error) => {
 }
 
 const handleDBError = (error) => {
-  const message =  `Invalid ${error.path}: ${error.value}`;
+  const message = `Invalid ${error.path}: ${error.value}`;
   return new AppError(message, 400);
 }
 
@@ -65,16 +65,16 @@ module.exports = (err, req, res, next) => {
     sendErrorDev(err, res);
   }
   else if (process.env.NODE_ENV === 'production'){
-    let error = {...err}
-    console.log(error)
-    if (err.name === 'CastError') error = handleDBError(err);
-    if (err.code === 11000) error = handleDBDuplicateFileError(err);
-    if (err.name === 'ValidationError') error = handleDBValidationError(err);
-    if (err.name === 'JsonWebTokenError') error = handleJWTError(err);
-    if (err.name === 'TokenExpiredError') error = handleExpiredTokenError(err);
-
+    let error = Object.assign({}, err);
+    error.message = err.message;
+    error.name = err.name;
+    
+    if (error.name === 'CastError') error = handleDBError(err);
+    if (error.code === 11000) error = handleDBDuplicateFileError(err);
+    if (error.name === 'ValidationError') error = handleDBValidationError(err);
+    if (error.name === 'JsonWebTokenError') error = handleJWTError(err);
+    if (error.name === 'TokenExpiredError') error = handleExpiredTokenError(err);
+    
     sendErrorProd(error, res);
   };
-
-  next();
 };

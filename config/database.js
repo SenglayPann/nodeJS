@@ -6,8 +6,8 @@ const databaseConfig = process.env.DATABASE.replace('<PASSWORD>', process.env.DA
 
 module.exports = mongoose.connect(databaseConfig, {
     useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false
+    useUnifiedTopology: true,
+
   })
   .then(con => {
     // console.log(con.connections);
