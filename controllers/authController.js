@@ -69,6 +69,8 @@ exports.protect = catchAsync(async (req, res, next) => {
   };
 
   const secret = process.env.JWT_SECRET;
+  
+  // VERIFY TOKEN HERE
   const decodedToken = await promisify(jwt.verify) (token, secret);
 
   // console.log(decodedToken);
