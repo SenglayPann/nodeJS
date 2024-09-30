@@ -15,6 +15,7 @@ exports.signup = catchAsync( async (req, res) => {
   const newUser = await User.create({
     name: req.body.name,
     email: req.body.email,
+    role: req.body.role,
     password: req.body.password,
     confirmPassword: req.body.confirmPassword,
     passwordChangedAt: req.body.passwordChangedAt
@@ -88,3 +89,14 @@ exports.protect = catchAsync(async (req, res, next) => {
   req.user = currentUser;
   next();
 });
+
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    console.log(req.user.role)
+    if (!roles.includes(req.user.role)) {
+      return next(new AppError('You have no permission to perform this acction', 401))
+    };
+
+    next();
+  }
+};
