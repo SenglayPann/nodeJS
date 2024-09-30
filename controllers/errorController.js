@@ -1,11 +1,11 @@
 const AppError = require("../utils/appError");
 
-const handleExpiredTokenError = (error) => {
+const handleExpiredTokenError = () => {
   const message = 'Your token has expired, Please Log in again!';
   return new AppError(message, 401);
 }
 
-const handleJWTError = (error) => {
+const handleJWTError = () => {
   const message = 'Invalid token, please login again!'
   return new AppError(message, 401);
 }

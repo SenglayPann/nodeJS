@@ -11,12 +11,13 @@ const signToken = id => {
   return  jwt.sign({ id }, secret, {expiresIn: expiresIn});
 }
 
-exports.signup = catchAsync( async (req, res, next) => {
+exports.signup = catchAsync( async (req, res) => {
   const newUser = await User.create({
     name: req.body.name,
     email: req.body.email,
     password: req.body.password,
-    confirmPassword: req.body.confirmPassword
+    confirmPassword: req.body.confirmPassword,
+    passwordChangedAt: req.body.passwordChangedAt
   });
 
   const token = signToken(newUser._id);
@@ -28,14 +29,13 @@ exports.signup = catchAsync( async (req, res, next) => {
       user: newUser
     }
   });
-  next();
 });
 
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
   //  1) check if email and password is exist
   if (!email || !password) {
-    next(new AppError('Please pprovide email and password!', 400));
+    next(new AppError('Please provide email and password!', 400));
   }
 
   // 2) check if user exists && password is correct
@@ -73,13 +73,18 @@ exports.protect = catchAsync(async (req, res, next) => {
   
   // 3) CHECK IF USER STILL EXISTS
 
-  const freshUser = await User.findById(decodedToken.id);
+  const currentUser = await User.findById(decodedToken.id);
   
-  if(!freshUser) {
+  if(!currentUser) {
     return next(new AppError('The user belonging to this token does no longer exist.', 401));
   }
 
   // 4) CHECK IF USER CHANGED PASSWORD AFTER THE TOKEN WAS ISSUED
+  if (currentUser.changedPasswordAfter(decodedToken.iat)) {
+    return next(new AppError('user recently changed password. Please login again!', 401));
+  };
 
+  // 5) GRAND ACCESS TO TOUR ROUTES
+  req.user = currentUser;
   next();
 });
