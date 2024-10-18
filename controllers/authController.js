@@ -5,27 +5,7 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const sendEmail = require('../utils/email');
 const crypto = require('crypto');
-const { error } = require('console');
-const { useId } = require('react');
-
-const signToken = id => {
-  const secret = process.env.JWT_SECRET
-  const expiresIn = process.env.JWT_EXPIRES_IN
-
-  return  jwt.sign({ id }, secret, {expiresIn: expiresIn});
-};
-
-const createSendToken = (user, statusCode, res) => {
-  const token = signToken(user._id);
-
-  res.status(statusCode).json({
-    status: 'success',
-    token,
-    data: {
-      user
-    }
-  })
-}
+const createSendToken = require('../utils/createSendToken')
 
 exports.signup = catchAsync( async (req, res) => {
   const newUser = await User.create({
