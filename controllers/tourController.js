@@ -86,7 +86,7 @@ exports.deleteTour = catchAsync(async (req, res, next) => {
 });
 
 
-exports.getTourStats = catchAsync(async (res) => {
+exports.getTourStats = catchAsync(async (req, res) => {
 
   const stats = await Tour.aggregate([
     {
