@@ -48,3 +48,14 @@ exports.updateMe = catchAsync( async (req, res, next) => {
 
   createSendToken(user, 201, res);
 });
+
+exports.deleteMe = catchAsync( async (req, res, next) => {
+  const user = req.user;
+
+  await user.findByIdAndUpdate(user._id, { active: false }).select('active');
+
+  res.status(204).json({
+    status: 'success',
+    data: null
+  });
+});
