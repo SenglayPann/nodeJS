@@ -24,7 +24,7 @@ if (process.env.NODE_ENV === 'development') {
 const limiter = rateLimit({
   max: 100,
   windowMs: 60 * 60 * 1000,
-  message: 'Too many requests from this IP, please try again in an hour!',
+  message: 'Too many requests from this IP, please try again in an hour!'
 });
 
 app.use('/api', limiter);
@@ -39,14 +39,25 @@ app.use(mongoSanitize());
 app.use(xss());
 
 // PREVENT PARAMETER POLLUTION
-app.use(hpp());
+app.use(
+  hpp({
+    whitelist: [
+      'duration',
+      'ratingsQuantity',
+      'ratingsAverage',
+      'maxGroupSize',
+      'difficulty',
+      'price'
+    ]
+  })
+);
 
 // SERVING STATIC FILES
 app.use(express.static(`${__dirname}/public`));
 
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
-  console.log(`req sent at ${ req.requestTime}`)
+  console.log(`req sent at ${req.requestTime}`);
   next();
 });
 
@@ -55,12 +66,10 @@ app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 
 // ROUTES ERROR HANDLING
-app.all("*", (req, res, next) => {
-
+app.all('*', (req, res, next) => {
   next(new appError(`Cannot find ${req.originalUrl} on this server`, 404));
 });
 
 app.use(errorHandler);
-
 
 module.exports = app;
