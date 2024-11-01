@@ -167,7 +167,7 @@ tourSchema.pre('aggregate', function(next) {
 //   next();
 // });
 
-tourSchema.pre(/^find/, function(doc, next) {
+tourSchema.pre(/^find/, function(next) {
   this.populate({
     path: 'guides',
     select: '-__v -passwordChangedAt'
