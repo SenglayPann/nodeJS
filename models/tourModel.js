@@ -1,6 +1,7 @@
 const mongoose =  require('mongoose');
 const slugify = require('slugify');
 const database = require('../config/database');
+const User = require('./userModel');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -152,6 +153,12 @@ tourSchema.post(/^find/, function(doc, next) {
 // AGGREGATION MIDDLEWARE
 tourSchema.pre('aggregate', function(next) {
   this.pipeline().unshift({ $match: { secretTour: { $ne: true} } });
+  next();
+});
+
+tourSchema.pre('save', async function(next) {
+  const guidesPromises = this.guides.map(async id => await User.findById(id));
+  this.guides = await Promise.all(guidesPromises);
   next();
 });
 
