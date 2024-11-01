@@ -175,5 +175,4 @@ tourSchema.pre(/^find/, function(doc, next) {
   next();
 });
 
-tourSchema
 module.exports = mongoose.model('tour', tourSchema);
