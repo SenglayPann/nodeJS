@@ -175,4 +175,6 @@ tourSchema.pre(/^find/, function(next) {
   next();
 });
 
-module.exports = mongoose.model('tour', tourSchema);
+const Tour = mongoose.model('Tour', tourSchema);
+
+module.exports = Tour;
