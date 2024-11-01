@@ -82,7 +82,41 @@ const tourSchema = new mongoose.Schema(
     secretTour: {
       type: Boolean,
       default: false
-    }
+    },
+    startLocation: {
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point']
+      },
+      coordinates: [Number],
+      address: String,
+      description: String
+    },
+    startLocation: {
+      // GeoJson
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point']    
+      },
+      coordinates: [Number],
+      address: String,
+      description: String
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point']
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number 
+      }
+    ],
 
   },
   {
@@ -101,18 +135,6 @@ tourSchema.pre('save', function(next) {
   // this.slug = this.name;
   next();
 });
-
-// tourSchema.pre('save', function(next) {
-//   console.log('will save doc...');
-//   next();
-// })
-
-// tourSchema.post('save', function(doc, next) {
-//   console.log(doc)
-//   next();
-// })
-
-// QUEERY MIDDLEWARE
 
 // tourSchema.pre('find', function(next) {
 tourSchema.pre(/^find/, function(next) {
