@@ -1,3 +1,4 @@
+const { path } = require('../app');
 const Tour = require('../models/tourModel');
 const APIFeatures = require('../utils/apiFeature');
 const AppError = require('../utils/appError');

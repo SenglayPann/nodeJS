@@ -167,5 +167,13 @@ tourSchema.pre('aggregate', function(next) {
 //   next();
 // });
 
+tourSchema.pre(/^find/, function(doc, next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt'
+  });
+  next();
+});
+
 tourSchema
 module.exports = mongoose.model('tour', tourSchema);
