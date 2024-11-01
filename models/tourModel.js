@@ -1,6 +1,7 @@
 const mongoose =  require('mongoose');
 const slugify = require('slugify');
 const database = require('../config/database');
+const { type } = require('os');
 // const User = require('./userModel');
 
 const tourSchema = new mongoose.Schema(
@@ -134,7 +135,14 @@ const tourSchema = new mongoose.Schema(
 
 tourSchema.virtual('durationWeeks').get(function() {
   return this.duration / 7
-})
+});
+
+// VIRTUAL POPULATE
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour',
+  localField: '_id'
+});
 
 // DOCUMENT MIDDLEWRE: run before .save() and .create()
 tourSchema.pre('save', function(next) {
