@@ -1,19 +1,19 @@
+const { path } = require('../app');
 const Tour = require('../models/tourModel');
 const APIFeatures = require('../utils/apiFeature');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
-exports.aliasTopTours = (req, res, next) => {
+exports.aliasTopTours = (req, next) => {
   req.query.limit = 5;
   req.query.sort = '-ratingAverage,price';
   req.query.fields = 'name,price,ratingAverage,summary,difficulty';
   next();
 }
 
-exports.getAllTours = catchAsync(async (req, res, next) => {
-  
+exports.getAllTours = catchAsync(async (req, res) => {
   // REXECUTE THE QUERY 
-  const features = new APIFeatures(Tour.find(), req.query)
+  const features = new APIFeatures(Tour.find().populate('reviews'), req.query)
     .filter()
     .sort()
     .limitFields()
@@ -33,7 +33,8 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
 
 exports.getTour = catchAsync(async (req, res, next) => {
 
-  const tour = await Tour.findById(req.params.id);
+  const tour = await Tour.findById(req.params.id)
+  .populate('reviews');
 
   if(!tour) {
     return next(new AppError(`No tour was found fo the id ${req.params.id}`), 404);
@@ -47,7 +48,7 @@ exports.getTour = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.createTour = catchAsync(async (req, res, next) => {
+exports.createTour = catchAsync(async (req, res) => {
 
   const newTour = await Tour.create(req.body);
 

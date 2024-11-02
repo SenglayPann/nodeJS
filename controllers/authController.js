@@ -5,7 +5,7 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const sendEmail = require('../utils/email');
 const crypto = require('crypto');
-const createSendtoken = require('../utils/createSendToken')
+const createSendToken = require('../utils/createSendToken')
 
 exports.signup = catchAsync( async (req, res) => {
   const newUser = await User.create({

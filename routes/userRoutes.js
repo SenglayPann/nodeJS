@@ -10,7 +10,8 @@ router
   .post('/forgotPassword', authController.forgotPassword)
   .patch('/resetPassword/:token', authController.resetPassword)
   .patch('/updatePassword', authController.protect, authController.updatePassword)
-  .patch('/updateMe', authController.protect, userController.updateMe);
+  .patch('/updateMe', authController.protect, userController.updateMe)
+  .delete('/deleteMe', authController.protect, userController.deleteMe);
 router
   .route('/')
   .get(userController.getAllUsers)
