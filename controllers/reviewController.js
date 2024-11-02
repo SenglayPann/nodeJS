@@ -3,10 +3,12 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
 exports.createReview = catchAsync(async (req, res, next) => {
+  if (!req.body.tour) req.body.tourId = req.params.tourId;
+  if (!req.body.user) req.body.user = req.user.id;
+
   const tour = await Review.create({
     review: req.body.review,
     rating: req.body.rating,
-    // tour: req.params.tourId,
     tour: req.body.tourId,
     user: req.user.id
   });
