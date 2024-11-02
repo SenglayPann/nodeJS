@@ -2,6 +2,7 @@ const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const createSendToken = require('../utils/createSendToken');
 const User = require('../models/userModel');
+const factory = require('../factories/handlerFactory');
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.find();
@@ -33,12 +34,7 @@ exports.updateUser = (req, res) => {
     message: 'This route is not yet defined!'
   });
 };
-exports.deleteUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not yet defined!'
-  });
-};
+exports.deleteUser = factory.deleteOne(User);
 
 exports.updateMe = catchAsync( async (req, res, next) => {
   // 1) CREATER AN ERROR IF USER POSTS PASSWORD DATA
