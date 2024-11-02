@@ -20,7 +20,7 @@ router
 router
   .route('/')
   .get(authController.protect, tourController.getAllTours)
-  .post(tourController.createTour);
+  .post(authController.protect, authController.restrictTo('admin', 'user'), tourController.createTour);
 
 router
   .route('/:id')
