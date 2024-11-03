@@ -26,7 +26,9 @@ exports.getAllReviews = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getReview = catchAsync(async (req, res, next) => {
+exports.getReview = factory.getOne(Review);
+
+catchAsync(async (req, res, next) => {
   const review = await Review.findById(req.params.id);
 
   if (!review) {
@@ -40,7 +42,6 @@ exports.getReview = catchAsync(async (req, res, next) => {
     }
   });
 });
-
 
 exports.deleteReview = factory.deleteOne(Review);
 
