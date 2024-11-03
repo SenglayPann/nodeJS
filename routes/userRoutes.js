@@ -11,7 +11,8 @@ router
   .patch('/resetPassword/:token', authController.resetPassword)
   .patch('/updatePassword', authController.protect, authController.updatePassword)
   .patch('/updateMe', authController.protect, userController.updateMe)
-  .delete('/deleteMe', authController.protect, userController.deleteMe);
+  .delete('/deleteMe', authController.protect, userController.deleteMe)
+  .get('/me', authController.protect, userController.getMe, userController.getUser);
 router
   .route('/')
   .get(userController.getAllUsers)

@@ -4,17 +4,7 @@ const createSendToken = require('../utils/createSendToken');
 const User = require('../models/userModel');
 const factory = require('../factories/handlerFactory');
 
-exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find();
-
-  res.status(200).json({
-    status: 'success',
-    results: users.length,
-    data: {
-      users
-    }
-  });
-});
+exports.getAllUsers = factory.getAll(User);
 
 exports.getUser = factory.getOne(User);
 
@@ -23,6 +13,11 @@ exports.createUser = factory.createOne(User);
 exports.updateUser = factory.updateOne(User);
 
 exports.deleteUser = factory.deleteOne(User);
+
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user._id;
+  next();
+};
 
 exports.updateMe = catchAsync( async (req, res, next) => {
   // 1) CREATER AN ERROR IF USER POSTS PASSWORD DATA
