@@ -144,6 +144,12 @@ tourSchema.virtual('reviews', {
   localField: '_id'
 });
 
+// INDEX (PERFORMANCE)
+// tourSchema.index({ price: 1 }); // 1 is for ascending	
+tourSchema.index({ price: 1, ratingAverage: -1 });
+tourSchema.index({ slug: 1 });
+
+
 // DOCUMENT MIDDLEWRE: run before .save() and .create()
 tourSchema.pre('save', function(next) {
   this.slug = slugify(this.name, { lower: true });
