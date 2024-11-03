@@ -1,5 +1,6 @@
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError'); 
+const APIFeatures = require('../utils/apiFeature');
 
 exports.deleteOne = Model => catchAsync(async (req, res, next) => {
   const doc = await Model.findByIdAndDelete(req.params.id);
@@ -54,3 +55,23 @@ exports.getOne = (Model, populateOptions) => catchAsync(async (req, res, next) =
     data: doc
   });
 });
+
+exports.getAll = (Model, populateOptions) => catchAsync(async (req, res, next) => {
+  const features = new APIFeatures(Model.find(), req.query )
+    .filter()
+    .sort()
+    .limitFields()
+    .pagination();
+
+  let query = features.query;
+  
+  if (populateOptions) query = query.populate(populateOptions);
+
+  const doc = await query;
+
+  res.status(200).json({
+    status: 'success',
+    results: doc.length,
+    data: doc
+  });
+})
