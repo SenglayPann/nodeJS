@@ -62,10 +62,17 @@ reviewSchema.statics.calAverageRatings = async function (tourId) {
     }
   ]);
 
-  await Tour.findByIdAndUpdate(tourId, {
-    ratingQuantity: stats[0].nRating,
-    ratingAverage: stats[0].avgRating
-  });
+  if (stats.length > 0) {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingQauntity: stats[0].nRating,
+      ratingAverage: stats[0].avgRating
+    });
+  } else {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingQuantity: 0,
+      ratingAverage: 4.5
+    });
+  }
 };
 
 reviewSchema.post('save', function() {
@@ -80,6 +87,7 @@ reviewSchema.pre(/^findOneAnd/, async function(next) {
 });
 
 reviewSchema.post(/^findOneAnd/, async function() {
+  console.log(this.r)
   await this.r.constructor.calAverageRatings(this.r.tour);
 });
 
