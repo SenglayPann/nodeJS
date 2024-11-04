@@ -1,7 +1,6 @@
 const mongoose =  require('mongoose');
 const slugify = require('slugify');
 const database = require('../config/database');
-const { type } = require('os');
 // const User = require('./userModel');
 
 const tourSchema = new mongoose.Schema(
@@ -149,7 +148,7 @@ tourSchema.virtual('reviews', {
 // tourSchema.index({ price: 1 }); // 1 is for ascending	
 tourSchema.index({ price: 1, ratingAverage: -1 });
 tourSchema.index({ slug: 1 });
-
+tourSchema.index({ startLocation: '2dsphere'});
 
 // DOCUMENT MIDDLEWRE: run before .save() and .create()
 tourSchema.pre('save', function(next) {

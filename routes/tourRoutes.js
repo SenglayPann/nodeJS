@@ -23,6 +23,10 @@ router
   .post(authController.protect, authController.restrictTo('admin', 'lead-guide'), tourController.createTour);
 
 router
+  .route('/tours-within/:distance/center/:latlng/unit/:unit')
+  .get(tourController.getToursWithin)
+
+router
   .route('/:id')
   .get(tourController.getTour)
   .patch(authController.protect, authController.restrictTo('admin', 'lead-guide'), tourController.updateTour)
