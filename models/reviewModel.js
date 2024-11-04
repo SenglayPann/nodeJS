@@ -32,6 +32,8 @@ const reviewSchema = new mongoose.Schema({
   toObject: {virtuals: true}
 });
 
+reviewSchema.index({tour: 1, user: 1}, {unique: true});
+
 reviewSchema.pre(/^find/, function(next) {
   // this.populate([{
   //   path: 'tour',
@@ -87,8 +89,9 @@ reviewSchema.pre(/^findOneAnd/, async function(next) {
 });
 
 reviewSchema.post(/^findOneAnd/, async function() {
-  console.log(this.r)
-  await this.r.constructor.calAverageRatings(this.r.tour);
+  if (this.r) {
+    await this.r.constructor.calAverageRatings(this.r.tour);
+  };
 });
 
 const Review = mongoose.model('Review', reviewSchema);
