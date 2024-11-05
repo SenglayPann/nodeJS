@@ -41,13 +41,9 @@ const tourSchema = new mongoose.Schema(
       max: [5, 'must be less tha or equal to 5'],
       set: val => Math.round(val * 10) / 10,
     },
-    ratingQauntity: {
+    ratingQuantity: {
       type: Number,
       default: 0
-    },
-    rating: {
-      type: Number,
-      default: 4.5
     },
     price: {
       type: Number,
@@ -75,7 +71,7 @@ const tourSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Atour must have a cover image']
     },
-    image: [String],
+    images: [String],
     createAt: {
       type: Date,
       default: Date.now()
@@ -86,21 +82,11 @@ const tourSchema = new mongoose.Schema(
       default: false
     },
     startLocation: {
-      type: {
-        type: String,
-        default: 'Point',
-        enum: ['Point']
-      },
-      coordinates: [Number],
-      address: String,
-      description: String
-    },
-    startLocation: {
       // GeoJson
       type: {
         type: String,
         default: 'Point',
-        enum: ['Point']    
+        enum: ['Point']
       },
       coordinates: [Number],
       address: String,
@@ -133,6 +119,12 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
+// INDEX (PERFORMANCE)
+// tourSchema.index({ price: 1 }); // 1 is for ascending	
+tourSchema.index({ price: 1, ratingAverage: -1 });
+tourSchema.index({ slug: 1 });
+tourSchema.index({ startLocation: '2dsphere' });
+
 tourSchema.virtual('durationWeeks').get(function() {
   return this.duration / 7
 });
@@ -144,11 +136,6 @@ tourSchema.virtual('reviews', {
   localField: '_id'
 });
 
-// INDEX (PERFORMANCE)
-// tourSchema.index({ price: 1 }); // 1 is for ascending	
-tourSchema.index({ price: 1, ratingAverage: -1 });
-tourSchema.index({ slug: 1 });
-tourSchema.index({ startLocation: '2dsphere'});
 
 // DOCUMENT MIDDLEWRE: run before .save() and .create()
 tourSchema.pre('save', function(next) {
@@ -170,10 +157,10 @@ tourSchema.post(/^find/, function(doc, next) {
 });
 
 // AGGREGATION MIDDLEWARE
-tourSchema.pre('aggregate', function(next) {
-  this.pipeline().unshift({ $match: { secretTour: { $ne: true} } });
-  next();
-});
+// tourSchema.pre('aggregate', function(next) {
+//   this.pipeline().unshift({ $match: { secretTour: { $ne: true} } });
+//   next();
+// });
 
 // tourSchema.pre('save', async function(next) {
 //   const guidesPromises = this.guides.map(async id => await User.findById(id));

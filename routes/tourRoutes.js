@@ -27,6 +27,10 @@ router
   .get(tourController.getToursWithin)
 
 router
+  .route('/distances/:latlng/unit/:unit')
+  .get(tourController.getDistances)
+
+router
   .route('/:id')
   .get(tourController.getTour)
   .patch(authController.protect, authController.restrictTo('admin', 'lead-guide'), tourController.updateTour)
