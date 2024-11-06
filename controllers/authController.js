@@ -44,7 +44,9 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   if (authHeaders && authHeaders.startsWith('Bearer')) {
     token = authHeaders.split(' ')[1];
-  };
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
 
   if (!token) {
     return next(new AppError('you are not logged in, Please login.', 401));
@@ -72,6 +74,41 @@ exports.protect = catchAsync(async (req, res, next) => {
   req.user = currentUser;
   next();
 });
+
+exports.isLoggedIn = async (req, res, next) => {
+  if (req.cookies.jwt) {
+    try {
+      // 1) VERIFY TOKEN
+      const decodedToken = await promisify(jwt.verify) (req.cookies.jwt, process.env.JWT_SECRET); 
+
+      // 2) CHECK IF USER STILL EXISTS  
+      const currentUser = await User.findById(decodedToken.id);
+      if (!currentUser) {
+        return next();
+      };
+
+      // 3) CHECK IF USER CHANGED PASSWORD AFTER THE TOKEN WAS ISSUED
+      if (currentUser.changedPasswordAfter(decodedToken.iat)) {
+        return next();
+      };
+
+      // THERE IS A LOGGED IN USER  
+      res.locals.user = currentUser;
+      return next();
+    } catch (err) {
+      return next();
+    }
+  }
+  next();
+};
+
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true
+  });
+  res.status(200).json({ status: 'success' });
+}
 
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
