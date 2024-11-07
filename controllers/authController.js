@@ -72,6 +72,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // 5) GRAND ACCESS TO TOUR ROUTES
   req.user = currentUser;
+  res.locals.user = currentUser;
   next();
 });
 
