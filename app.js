@@ -38,6 +38,7 @@ app.use('/api', limiter);
 
 // BODY PARSING, READING DATA FROM BODY REQUEST
 app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 // COOKIE PARSER
 app.use(cookieParser());
 

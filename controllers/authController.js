@@ -192,6 +192,7 @@ exports.updatePassword = catchAsync( async (req, res, next) => {
 
   const user = await User.findById(userId).select('+password');
   const { currentPassword, newPassword, newPasswordConfirm } = req.body;
+  console.log(currentPassword, newPassword, newPasswordConfirm)
   
   // 2) CHECK IF POSTED CURRENT PASSWORD IS CORRECT
   const isCurrectPassword = await user.correctPassword(currentPassword, user.password);

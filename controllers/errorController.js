@@ -44,25 +44,40 @@ const sendErrorDev = (err, req, res) => {
   }
 };
 
-const sendErrorProd = (err, res) => {
+const sendErrorProd = (err, req, res) => {
+  // API
+  if (req.originalUrl.startsWith('/api')) {
+    // Operational, trusted error: send message to client
+    if (err.isOperational) {
+      return res.status(err.statusCode).json({
+        status: err.status,
+        message: err.message
+      });
+    };
 
-  // OPERATIONAL, TRUSTED ERROR, SEND MESSAGE TO CLIENT
-  if (err.isOperational) {
-    res.status(err.statusCode).json({
-      status: err.status,
-      message: err.message,
-    });
-  }
-
-  // PROGRAMMING ERROR OR OTHER UNKNOWN ERROR: DON'T LEAK ERROR TO THE CLIENT
-  else {
-    console.log('ERROR: ', err);
-
-    res.status(500).json({
+    // Programming or other unknown error: don't leak error details
+    console.error('ERROR 💥', err);
+    return res.status(500).json({
       status: 'error',
-      message: 'Something went wrong, please try again later.'
+      message: 'Something went very wrong!'
     });
   };
+
+  // RENDERED WEBSITE
+  if (err.isOperational) {
+    return res.status(err.statusCode).render('error', {
+      title: 'Something went wrong!',
+      msg: err.message
+    }); 
+
+  }
+
+  console.error('ERROR 💥', err);
+  return res.status(500).render('error', {
+    title: 'Something went very wrong!',
+    msg: 'Please try again later!'
+  });
+
 };
 
 module.exports = (err, req, res, next) => {
@@ -83,6 +98,6 @@ module.exports = (err, req, res, next) => {
     if (error.name === 'JsonWebTokenError') error = handleJWTError(err);
     if (error.name === 'TokenExpiredError') error = handleExpiredTokenError(err);
     
-    sendErrorProd(error, res);
+    sendErrorProd(error, req, res);
   };
 };
