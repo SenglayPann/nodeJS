@@ -1,9 +1,9 @@
-const AppError = require("../utils/appError");
-const catchAsync = require("../utils/catchAsync");
-const createSendToken = require('../utils/createSendToken');
+const AppError = require('../utils/appError');
+const catchAsync = require('../utils/catchAsync');
 const User = require('../models/userModel');
 const factory = require('../factories/handlerFactory');
 const filterObj = require('../utils/filterObj');
+const sharp = require('sharp');
 
 exports.getAllUsers = factory.getAll(User);
 
@@ -20,11 +20,30 @@ exports.getMe = (req, res, next) => {
   next();
 };
 
-exports.updateMe = catchAsync( async (req, res, next) => {
+exports.resizePhoto = catchAsync(async (req, res, next) => {
+  if (!req.file) return next();
+
+  req.file.filename = `user-${req.user._id}-${Date.now()}.jpeg`;
+
+  sharp(req.file.buffer)
+    .resize(500, 500)
+    .toFormat('jpeg')
+    .jpeg({ quality: 90 })
+    .toFile(`public/img/users/${req.file.filename}`);
+
+  next();
+});
+
+exports.updateMe = catchAsync(async (req, res, next) => {
   // 1) CREATER AN ERROR IF USER POSTS PASSWORD DATA
   if (req.body.newPassword || req.body.newPasswordConfirm) {
-    return next(new AppError('This Route is not for password updates. Please use updateMyPassword route.', 400));
-  };
+    return next(
+      new AppError(
+        'This Route is not for password updates. Please use updateMyPassword route.',
+        400
+      )
+    );
+  }
 
   // 2) FILTERED OUT UNWANTED FIELDS NAME THAT ARE NOT ALLOWED TO BE UPDATED
   const filteredBody = filterObj(req.body, 'name', 'email');
