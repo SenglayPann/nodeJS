@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
-const Emaill = require('../utils/email');
+const Email = require('../utils/email');
 const crypto = require('crypto');
 const createSendToken = require('../utils/createSendToken')
 
@@ -18,7 +18,7 @@ exports.signup = catchAsync( async (req, res) => {
 
   const url = `${req.protocol}://${req.get('host')}/me`;
 
-  await new Emaill(newUser, url).sendWelcome();
+  await new Email(newUser, url).sendWelcome();
   createSendToken(newUser, 201, res);
 });
 
@@ -147,6 +147,8 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     //   subject: 'Your password Token is only valid for 10mn.',
     //   message
     // });
+
+    await new Email(user, resetUrl).sendPasswordReset();
   
     res.status(200).json({
       status: 'success',
