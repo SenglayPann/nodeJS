@@ -3,7 +3,35 @@ const catchAsync = require('../utils/catchAsync');
 const User = require('../models/userModel');
 const factory = require('../factories/handlerFactory');
 const filterObj = require('../utils/filterObj');
+const multer = require('multer');
 const sharp = require('sharp');
+
+// const multerStorage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, 'public/img/users');
+//   },
+//   filename: (req, file, cb) => {
+//     const ext = file.mimetype.split('/')[1];
+//     cb(null, 'user-' + req.user.id + '-' + Date.now() + '.' + ext);
+//   }
+// });
+
+const multerStorage = multer.memoryStorage(); // image will be stored as buffer
+
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(new AppError('Not an Image! Please provide an image', 400), false);
+  }
+};
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter
+});
+
+exports.uploadUserPhoto = upload.single('photo');
 
 exports.getAllUsers = factory.getAll(User);
 
