@@ -24,6 +24,21 @@ app.set('views', path.join(__dirname, 'views'));
 // SECURITY HTTP HEADERS
 app.use(helmet());
 
+// Set up Helmet with CSP configuration
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "https://js.stripe.com"], // Allow Stripe scripts
+        connectSrc: ["'self'", "ws://127.0.0.1:49641"], // Allow WebSocket connection for HMR
+        frameSrc: ["'self'", "https://js.stripe.com"],
+        // Add other directives as needed, such as styleSrc, imgSrc, etc.
+      },
+    },
+  })
+);
+
 // DEVELOPMENT LOGGING
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
