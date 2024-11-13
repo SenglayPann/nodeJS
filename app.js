@@ -8,6 +8,7 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
 
+const compression = require('compression');
 const appError = require('./utils/appError');
 const errorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
@@ -77,6 +78,9 @@ app.use(
     ]
   })
 );
+
+// COMPRESS DATA
+app.use(compression());
 
 // SERVING STATIC FILES
 // app.use(express.static(`${__dirname}/public`));
