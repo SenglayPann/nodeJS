@@ -19,7 +19,7 @@ exports.signup = catchAsync( async (req, res) => {
   const url = `${req.protocol}://${req.get('host')}/me`;
 
   await new Email(newUser, url).sendWelcome();
-  createSendToken(newUser, 201, res);
+  createSendToken(newUser, 201, req, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -37,7 +37,7 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Incorrect email or password', 401));
   }
   // 3) check if everything is okay, send token to the cilent.
-  createSendToken(user, 201, res);
+  createSendToken(user, 201, req, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -188,7 +188,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   await user.save();
   
   // 4) LOG THE USER IN, SEND JWT
-  createSendToken(user, 201, res);
+  createSendToken(user, 201, req, res);
 });
 
 exports.updatePassword = catchAsync( async (req, res, next) => {
@@ -213,5 +213,5 @@ exports.updatePassword = catchAsync( async (req, res, next) => {
   // User.findbyIdAndUpdate is not goona works as intended!
 
   // 4) LOG USER IN,  SEND JWT
-  createSendToken(updatedUser, 201, res);
+  createSendToken(updatedUser, 201, req, res);
 });
